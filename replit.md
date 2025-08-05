@@ -35,7 +35,7 @@ Preferred communication style: Simple, everyday language.
 - **ORM**: Drizzle ORM configured for PostgreSQL (ready for database integration)
 
 ### Authentication & Authorization
-- **Student Authentication**: College ID based authentication (format: SJCET + 7 digits)
+- **Student Authentication**: College ID based authentication (flexible format, minimum 3 characters)
 - **Admin Authentication**: Simple username/password authentication
 - **Authorization Pattern**: Role-based access with separate student and admin endpoints
 - **Session Strategy**: Stateless authentication suitable for development environment

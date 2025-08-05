@@ -71,8 +71,8 @@ export type SystemSettings = typeof systemSettings.$inferSelect;
 export type InsertSystemSettings = z.infer<typeof insertSystemSettingsSchema>;
 
 // Custom validation schemas
-export const collegeIdSchema = z.string().regex(/^SJCET\d{7}$/, {
-  message: "College ID must be in format SJCET followed by 7 digits (e.g., SJCET2024001)"
+export const collegeIdSchema = z.string().min(3, {
+  message: "College ID must be at least 3 characters long"
 });
 
 export const adminLoginSchema = z.object({

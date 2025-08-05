@@ -16,8 +16,8 @@ import BookingSummary from "@/components/booking-summary";
 import type { Student, BusRoute } from "@shared/schema";
 
 const collegeIdSchema = z.object({
-  collegeId: z.string().regex(/^SJCET\d{7}$/, {
-    message: "College ID must be in format SJCET followed by 7 digits (e.g., SJCET2024001)"
+  collegeId: z.string().min(3, {
+    message: "College ID must be at least 3 characters long"
   })
 });
 
@@ -192,7 +192,7 @@ export default function StudentPortal() {
                         <div className="flex gap-2">
                           <FormControl>
                             <Input 
-                              placeholder="Enter College ID (e.g., SJCET2024001)" 
+                              placeholder="Enter your College ID" 
                               {...field} 
                             />
                           </FormControl>
@@ -206,7 +206,7 @@ export default function StudentPortal() {
                         </div>
                         <FormMessage />
                         <p className="text-sm text-muted-foreground">
-                          Format: SJCET followed by year and roll number
+                          Enter your college-issued student ID
                         </p>
                       </FormItem>
                     )}
