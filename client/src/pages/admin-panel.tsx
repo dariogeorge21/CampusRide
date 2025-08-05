@@ -235,7 +235,7 @@ export default function AdminPanel() {
                     <FormItem>
                       <FormLabel>Username</FormLabel>
                       <FormControl>
-                        <Input placeholder="admin@sjcet.edu" {...field} />
+                        <Input placeholder="example@test.com" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

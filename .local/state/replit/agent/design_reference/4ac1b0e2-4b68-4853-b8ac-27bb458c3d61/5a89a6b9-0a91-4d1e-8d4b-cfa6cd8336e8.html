@@ -1,0 +1,656 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>St Joseph's College Bus Pass Booking System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1565C0',
+                        'primary-dark': '#0D47A1',
+                        secondary: '#FFA726',
+                        success: '#4CAF50',
+                        warning: '#FF9800',
+                        error: '#F44336',
+                        surface: '#FFFFFF',
+                        background: '#FAFAFA'
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'material': '0 2px 4px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.1)',
+                        'material-lg': '0 4px 8px rgba(0,0,0,0.12), 0 12px 24px rgba(0,0,0,0.15)'
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="font-inter bg-background text-gray-900">
+    <!-- @COMPONENT: Header [College branding and navigation] -->
+    <header class="bg-primary text-white shadow-material">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-primary text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-semibold">St Joseph's College</h1>
+                        <p class="text-blue-100 text-sm">Engineering & Technology</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex items-center space-x-6">
+                    <button class="text-white hover:text-blue-100 transition-colors duration-200" data-tab="student">
+                        <i class="fas fa-user mr-2"></i>Student Portal
+                    </button>
+                    <button class="text-blue-100 hover:text-white transition-colors duration-200" data-tab="admin">
+                        <i class="fas fa-cog mr-2"></i>Admin Panel
+                    </button>
+                </nav>
+                <button class="md:hidden text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: Header -->
+
+    <!-- @COMPONENT: StudentPortal [Main booking interface for students] -->
+    <div id="student-portal" class="min-h-screen">
+        <!-- Hero Section -->
+        <div class="bg-gradient-to-r from-primary to-primary-dark text-white py-16">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <h2 class="text-4xl font-bold mb-4">Bus Pass Booking System</h2>
+                <p class="text-xl text-blue-100">Book your college transportation easily and efficiently</p>
+            </div>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <!-- College ID Entry Section -->
+            <!-- @STATE: collegeId:string = "", isAuthenticated:boolean = false -->
+            <div class="bg-surface rounded-lg shadow-material p-6 mb-8">
+                <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-id-card text-primary mr-3"></i>
+                    Student Authentication
+                </h3>
+                <div class="max-w-md">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            placeholder="Enter College ID (e.g., SJCET2024001)"
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none transition-colors"
+                            data-bind="collegeId"
+                            data-mock="true"
+                        />
+                        <button 
+                            class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
+                            data-event="click:authenticateStudent"
+                        >
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">Format: SJCET followed by year and roll number</p>
+                </div>
+            </div>
+
+            <!-- Booking History Section (shown after authentication) -->
+            <div class="bg-surface rounded-lg shadow-material p-6 mb-8" data-show-when="isAuthenticated">
+                <h3 class="text-xl font-semibold mb-4 flex items-center">
+                    <i class="fas fa-history text-secondary mr-3"></i>
+                    Your Booking History
+                </h3>
+                <!-- @MAP: bookingHistory.map(booking => ( -->
+                <div class="border-l-4 border-success bg-green-50 p-4 mb-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-medium text-gray-900" data-bind="booking.busNumber" data-mock="true">Bus #BUS-001</p>
+                            <p class="text-sm text-gray-600" data-bind="booking.route" data-mock="true">Tambaram → SJCET Campus</p>
+                            <p class="text-sm text-gray-500" data-bind="booking.date" data-mock="true">Date: 2024-12-15</p>
+                        </div>
+                        <span class="bg-success text-white px-3 py-1 rounded-full text-sm">Confirmed</span>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+                <div class="border-l-4 border-warning bg-yellow-50 p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="font-medium text-gray-900" data-mock="true">Bus #BUS-003</p>
+                            <p class="text-sm text-gray-600" data-mock="true">Velachery → SJCET Campus</p>
+                            <p class="text-sm text-gray-500" data-mock="true">Date: 2024-12-18</p>
+                        </div>
+                        <span class="bg-warning text-white px-3 py-1 rounded-full text-sm">Pending</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bus Booking Section -->
+            <div class="bg-surface rounded-lg shadow-material p-6" data-show-when="isAuthenticated">
+                <h3 class="text-2xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-bus text-primary mr-3"></i>
+                    Book New Ticket
+                </h3>
+
+                <!-- Bus Selection -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- @MAP: availableBuses.map(bus => ( -->
+                    <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-primary transition-colors cursor-pointer" data-event="click:selectBus">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-semibold text-lg" data-bind="bus.number" data-mock="true">Bus #BUS-001</h4>
+                            <span class="bg-success text-white px-2 py-1 rounded text-sm">
+                                <span data-bind="bus.availableSeats" data-mock="true">23</span> seats
+                            </span>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-map-marker-alt text-primary mr-2"></i>
+                                <span data-bind="bus.route" data-mock="true">Tambaram → SJCET Campus</span>
+                            </p>
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-clock text-primary mr-2"></i>
+                                <span data-bind="bus.departureTime" data-mock="true">07:30 AM</span>
+                            </p>
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-route text-primary mr-2"></i>
+                                <span data-bind="bus.returnTime" data-mock="true">Return: 05:00 PM</span>
+                            </p>
+                        </div>
+                    </div>
+                    <!-- @END_MAP )) -->
+                    
+                    <div class="border-2 border-gray-200 rounded-lg p-4 hover:border-primary transition-colors cursor-pointer">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-semibold text-lg" data-mock="true">Bus #BUS-002</h4>
+                            <span class="bg-warning text-white px-2 py-1 rounded text-sm" data-mock="true">8 seats</span>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-map-marker-alt text-primary mr-2"></i>
+                                <span data-mock="true">Chrompet → SJCET Campus</span>
+                            </p>
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-clock text-primary mr-2"></i>
+                                <span data-mock="true">08:00 AM</span>
+                            </p>
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-route text-primary mr-2"></i>
+                                <span data-mock="true">Return: 05:30 PM</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="border-2 border-gray-200 rounded-lg p-4 opacity-50">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-semibold text-lg" data-mock="true">Bus #BUS-003</h4>
+                            <span class="bg-error text-white px-2 py-1 rounded text-sm" data-mock="true">Full</span>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-map-marker-alt text-primary mr-2"></i>
+                                <span data-mock="true">Velachery → SJCET Campus</span>
+                            </p>
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-clock text-primary mr-2"></i>
+                                <span data-mock="true">07:45 AM</span>
+                            </p>
+                            <p class="text-gray-600 flex items-center">
+                                <i class="fas fa-route text-primary mr-2"></i>
+                                <span data-mock="true">Return: 05:15 PM</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date Selection -->
+                <!-- @STATE: selectedDate:string = "", selectedBus:object = null -->
+                <div class="bg-gray-50 rounded-lg p-6 mb-6" data-show-when="selectedBus">
+                    <h4 class="text-lg font-semibold mb-4">Select Travel Date</h4>
+                    <input 
+                        type="date" 
+                        class="w-full md:w-auto px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-primary focus:outline-none"
+                        data-bind="selectedDate"
+                        min="2024-12-10"
+                    />
+                </div>
+
+                <!-- Booking Confirmation -->
+                <div class="bg-blue-50 border border-primary rounded-lg p-6" data-show-when="selectedBus && selectedDate">
+                    <h4 class="text-lg font-semibold mb-4 text-primary">Booking Summary</h4>
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <p class="text-sm text-gray-600">Bus Number</p>
+                            <p class="font-medium" data-bind="selectedBus.number" data-mock="true">Bus #BUS-001</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Route</p>
+                            <p class="font-medium" data-bind="selectedBus.route" data-mock="true">Tambaram → SJCET Campus</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Travel Date</p>
+                            <p class="font-medium" data-bind="selectedDate" data-mock="true">2024-12-15</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Departure Time</p>
+                            <p class="font-medium" data-bind="selectedBus.departureTime" data-mock="true">07:30 AM</p>
+                        </div>
+                    </div>
+                    <button 
+                        class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+                        data-event="click:confirmBooking"
+                        data-implementation="Should validate all fields and submit booking"
+                    >
+                        <i class="fas fa-check mr-2"></i>
+                        Confirm Booking
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: StudentPortal -->
+
+    <!-- @COMPONENT: AdminPanel [Administrative interface for managing buses and bookings] -->
+    <div id="admin-panel" class="hidden min-h-screen">
+        <!-- Admin Authentication -->
+        <!-- @STATE: isAdminAuthenticated:boolean = false -->
+        <div class="bg-gray-100 min-h-screen flex items-center justify-center" data-show-when="!isAdminAuthenticated">
+            <div class="bg-surface rounded-lg shadow-material-lg p-8 w-full max-w-md">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-900">Admin Access</h2>
+                    <p class="text-gray-600">Enter administrator credentials</p>
+                </div>
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                        <input 
+                            type="text" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary focus:outline-none"
+                            placeholder="admin@sjcet.edu"
+                            data-mock="true"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input 
+                            type="password" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary focus:outline-none"
+                            placeholder="••••••••"
+                            data-mock="true"
+                        />
+                    </div>
+                    <button 
+                        type="submit" 
+                        class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+                        data-event="click:adminLogin"
+                    >
+                        Sign In
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div class="bg-background min-h-screen" data-show-when="isAdminAuthenticated">
+            <!-- Admin Header -->
+            <div class="bg-surface shadow-sm border-b">
+                <div class="max-w-7xl mx-auto px-4 py-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold text-gray-900">Admin Dashboard</h2>
+                        <div class="flex items-center space-x-4">
+                            <!-- @STATE: systemStatus:string = "online" -->
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm text-gray-600">System Status:</span>
+                                <button 
+                                    class="flex items-center space-x-2 px-3 py-1 rounded-full text-sm font-medium"
+                                    data-bind="systemStatus === 'online' ? 'bg-success text-white' : 'bg-error text-white'"
+                                    data-event="click:toggleSystemStatus"
+                                >
+                                    <div class="w-2 h-2 bg-white rounded-full" data-mock="true"></div>
+                                    <span data-bind="systemStatus" data-mock="true">Online</span>
+                                </button>
+                            </div>
+                            <button class="text-gray-600 hover:text-gray-900">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <!-- System Status Alert (when offline) -->
+                <div class="bg-yellow-50 border border-warning rounded-lg p-4 mb-6" data-show-when="systemStatus === 'offline'">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle text-warning mr-3"></i>
+                        <div>
+                            <h4 class="font-medium text-gray-900">System Offline</h4>
+                            <p class="text-gray-600">Students will see "Come back later" message for new bookings</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-surface rounded-lg shadow-material p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Total Buses</p>
+                                <p class="text-3xl font-bold text-primary" data-mock="true">12</p>
+                            </div>
+                            <i class="fas fa-bus text-primary text-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="bg-surface rounded-lg shadow-material p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Today's Bookings</p>
+                                <p class="text-3xl font-bold text-success" data-mock="true">387</p>
+                            </div>
+                            <i class="fas fa-ticket-alt text-success text-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="bg-surface rounded-lg shadow-material p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Available Seats</p>
+                                <p class="text-3xl font-bold text-secondary" data-mock="true">123</p>
+                            </div>
+                            <i class="fas fa-chair text-secondary text-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="bg-surface rounded-lg shadow-material p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Active Routes</p>
+                                <p class="text-3xl font-bold text-gray-900" data-mock="true">8</p>
+                            </div>
+                            <i class="fas fa-route text-gray-600 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bus Management -->
+                <div class="bg-surface rounded-lg shadow-material p-6 mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-semibold">Bus Route Management</h3>
+                        <button 
+                            class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors"
+                            data-event="click:openAddBusModal"
+                        >
+                            <i class="fas fa-plus mr-2"></i>Add New Route
+                        </button>
+                    </div>
+
+                    <!-- Add/Edit Bus Form -->
+                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <h4 class="text-lg font-semibold mb-4">Create New Bus Route</h4>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Bus Number</label>
+                                <input 
+                                    type="text" 
+                                    placeholder="e.g., BUS-001"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary focus:outline-none"
+                                    data-mock="true"
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Origin Location</label>
+                                <input 
+                                    type="text" 
+                                    placeholder="e.g., Tambaram"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary focus:outline-none"
+                                    data-mock="true"
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Destination</label>
+                                <input 
+                                    type="text" 
+                                    placeholder="e.g., SJCET Campus"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary focus:outline-none"
+                                    data-mock="true"
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Available Seats</label>
+                                <input 
+                                    type="number" 
+                                    placeholder="e.g., 40"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary focus:outline-none"
+                                    data-mock="true"
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Departure Time</label>
+                                <input 
+                                    type="time" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary focus:outline-none"
+                                    data-mock="true"
+                                />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Return Time</label>
+                                <input 
+                                    type="time" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-primary focus:outline-none"
+                                    data-mock="true"
+                                />
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <button 
+                                class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-colors"
+                                data-event="click:createBusRoute"
+                                data-implementation="Should validate form and create new bus route"
+                            >
+                                <i class="fas fa-save mr-2"></i>Create Route
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Bus Routes Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Bus Number</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Route</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Seats</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Timing</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <!-- @MAP: busRoutes.map(route => ( -->
+                                <tr>
+                                    <td class="px-4 py-3 font-medium" data-bind="route.busNumber" data-mock="true">BUS-001</td>
+                                    <td class="px-4 py-3" data-bind="route.route" data-mock="true">Tambaram → SJCET</td>
+                                    <td class="px-4 py-3" data-mock="true">23/40</td>
+                                    <td class="px-4 py-3 text-sm" data-mock="true">07:30 - 17:00</td>
+                                    <td class="px-4 py-3">
+                                        <span class="bg-success text-white px-2 py-1 rounded-full text-xs" data-mock="true">Active</span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-primary-dark" data-event="click:editRoute">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-error hover:text-red-700" data-event="click:deleteRoute">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- @END_MAP )) -->
+                                <tr>
+                                    <td class="px-4 py-3 font-medium" data-mock="true">BUS-002</td>
+                                    <td class="px-4 py-3" data-mock="true">Chrompet → SJCET</td>
+                                    <td class="px-4 py-3" data-mock="true">8/35</td>
+                                    <td class="px-4 py-3 text-sm" data-mock="true">08:00 - 17:30</td>
+                                    <td class="px-4 py-3">
+                                        <span class="bg-success text-white px-2 py-1 rounded-full text-xs" data-mock="true">Active</span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-primary-dark">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-error hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-medium" data-mock="true">BUS-003</td>
+                                    <td class="px-4 py-3" data-mock="true">Velachery → SJCET</td>
+                                    <td class="px-4 py-3" data-mock="true">0/40</td>
+                                    <td class="px-4 py-3 text-sm" data-mock="true">07:45 - 17:15</td>
+                                    <td class="px-4 py-3">
+                                        <span class="bg-error text-white px-2 py-1 rounded-full text-xs" data-mock="true">Full</span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex space-x-2">
+                                            <button class="text-primary hover:text-primary-dark">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-error hover:text-red-700">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Recent Bookings -->
+                <div class="bg-surface rounded-lg shadow-material p-6">
+                    <h3 class="text-xl font-semibold mb-6">Recent Bookings</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Student ID</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Bus</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Date</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Booking Time</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <!-- @MAP: recentBookings.map(booking => ( -->
+                                <tr>
+                                    <td class="px-4 py-3 font-medium" data-bind="booking.studentId" data-mock="true">SJCET2024001</td>
+                                    <td class="px-4 py-3" data-bind="booking.busNumber" data-mock="true">BUS-001</td>
+                                    <td class="px-4 py-3" data-bind="booking.travelDate" data-mock="true">2024-12-15</td>
+                                    <td class="px-4 py-3 text-sm" data-bind="booking.bookingTime" data-mock="true">09:34 AM</td>
+                                    <td class="px-4 py-3">
+                                        <span class="bg-success text-white px-2 py-1 rounded-full text-xs" data-mock="true">Confirmed</span>
+                                    </td>
+                                </tr>
+                                <!-- @END_MAP )) -->
+                                <tr>
+                                    <td class="px-4 py-3 font-medium" data-mock="true">SJCET2024042</td>
+                                    <td class="px-4 py-3" data-mock="true">BUS-002</td>
+                                    <td class="px-4 py-3" data-mock="true">2024-12-15</td>
+                                    <td class="px-4 py-3 text-sm" data-mock="true">09:28 AM</td>
+                                    <td class="px-4 py-3">
+                                        <span class="bg-warning text-white px-2 py-1 rounded-full text-xs" data-mock="true">Pending</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 font-medium" data-mock="true">SJCET2024125</td>
+                                    <td class="px-4 py-3" data-mock="true">BUS-001</td>
+                                    <td class="px-4 py-3" data-mock="true">2024-12-16</td>
+                                    <td class="px-4 py-3 text-sm" data-mock="true">09:15 AM</td>
+                                    <td class="px-4 py-3">
+                                        <span class="bg-success text-white px-2 py-1 rounded-full text-xs" data-mock="true">Confirmed</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: AdminPanel -->
+
+    <!-- @COMPONENT: OfflineMessage [Displayed when system is offline] -->
+    <div id="offline-message" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-surface rounded-lg p-8 max-w-md mx-4 text-center">
+            <div class="w-16 h-16 bg-warning rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-tools text-white text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">System Under Maintenance</h3>
+            <p class="text-gray-600 mb-6">We're currently updating our booking system. Please come back later.</p>
+            <button 
+                class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-colors"
+                data-event="click:closeOfflineMessage"
+            >
+                Understood
+            </button>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: OfflineMessage -->
+
+    <script>
+        // TODO: Implement React components with proper state management
+        // TODO: Add form validation for college ID format (SJCET + year + roll number)
+        // TODO: Implement real-time seat availability updates
+        // TODO: Add booking confirmation and email notifications
+        // TODO: Implement admin authentication with secure password handling
+        // TODO: Add database integration for persistent data storage
+        // TODO: Implement offline/online system toggle functionality
+        
+        (function() {
+            // Simple tab switching functionality for demo
+            const studentTab = document.querySelector('[data-tab="student"]');
+            const adminTab = document.querySelector('[data-tab="admin"]');
+            const studentPortal = document.getElementById('student-portal');
+            const adminPanel = document.getElementById('admin-panel');
+
+            studentTab.addEventListener('click', () => {
+                studentPortal.classList.remove('hidden');
+                adminPanel.classList.add('hidden');
+                studentTab.classList.add('text-white');
+                studentTab.classList.remove('text-blue-100');
+                adminTab.classList.add('text-blue-100');
+                adminTab.classList.remove('text-white');
+            });
+
+            adminTab.addEventListener('click', () => {
+                adminPanel.classList.remove('hidden');
+                studentPortal.classList.add('hidden');
+                adminTab.classList.add('text-white');
+                adminTab.classList.remove('text-blue-100');
+                studentTab.classList.add('text-blue-100');
+                studentTab.classList.remove('text-white');
+            });
+
+            // Demo functionality for bus selection
+            const busCards = document.querySelectorAll('[data-event="click:selectBus"]');
+            busCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    // Remove previous selections
+                    busCards.forEach(c => c.classList.remove('border-primary', 'bg-blue-50'));
+                    // Add selection to clicked card
+                    card.classList.add('border-primary', 'bg-blue-50');
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

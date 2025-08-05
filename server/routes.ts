@@ -17,7 +17,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { username, password } = adminLoginSchema.parse(req.body);
       
       // Simple admin authentication (in production, use proper hashing)
-      if (username === "admin@sjcet.edu" && password === "admin123") {
+      if (username === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
         res.json({ success: true, message: "Login successful" });
       } else {
         res.status(401).json({ success: false, message: "Invalid credentials" });
