@@ -20,6 +20,7 @@ export const busRoutes = pgTable("bus_routes", {
   availableSeats: integer("available_seats").notNull(),
   departureTime: text("departure_time").notNull(),
   returnTime: text("return_time").notNull(),
+  availableDates: text("available_dates").array().notNull().default(sql`'{}'`),
   isActive: boolean("is_active").notNull().default(true),
 });
 

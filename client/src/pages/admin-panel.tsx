@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as React from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +29,7 @@ const busRouteSchema = z.object({
   availableSeats: z.number().min(0, "Available seats cannot be negative"),
   departureTime: z.string().min(1, "Departure time is required"),
   returnTime: z.string().min(1, "Return time is required"),
+  availableDates: z.array(z.string()).default([]),
   isActive: z.boolean().default(true),
 });
 
@@ -52,6 +54,7 @@ export default function AdminPanel() {
       availableSeats: 40,
       departureTime: "",
       returnTime: "",
+      availableDates: [],
       isActive: true
     }
   });
@@ -74,11 +77,15 @@ export default function AdminPanel() {
 
   const { data: currentSystemStatus, refetch: refetchSystemStatus } = useQuery({
     queryKey: ['/api/system/status'],
-    enabled: isAuthenticated,
-    onSuccess: (data) => {
-      setSystemStatus(data.status as 'online' | 'offline');
-    }
+    enabled: isAuthenticated
   });
+  
+  // Update system status when data changes
+  React.useEffect(() => {
+    if (currentSystemStatus) {
+      setSystemStatus((currentSystemStatus as any)?.status as 'online' | 'offline');
+    }
+  }, [currentSystemStatus]);
 
   // Mutations
   const loginMutation = useMutation({
@@ -307,9 +314,9 @@ export default function AdminPanel() {
         )}
 
         {/* Stats Overview */}
-        {stats?.stats && (
+        {(stats as any)?.stats && (
           <div className="mb-8">
-            <AdminStats stats={stats.stats} />
+            <AdminStats stats={(stats as any).stats} />
           </div>
         )}
 
@@ -440,6 +447,63 @@ export default function AdminPanel() {
                       />
                     </div>
                     
+                    {/* Available Dates Management */}
+                    <div className="mb-4">
+                      <FormLabel className="text-base font-medium">Available Dates</FormLabel>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Set which dates this bus route will be available for booking
+                      </p>
+                      <div className="flex gap-2 mb-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const dates = [];
+                            const today = new Date();
+                            for (let i = 0; i < 30; i++) {
+                              const date = new Date(today);
+                              date.setDate(today.getDate() + i);
+                              dates.push(date.toISOString().split('T')[0]);
+                            }
+                            busRouteForm.setValue('availableDates', dates);
+                          }}
+                        >
+                          Next 30 Days
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const dates = [];
+                            const today = new Date();
+                            for (let i = 0; i < 7; i++) {
+                              const date = new Date(today);
+                              date.setDate(today.getDate() + i);
+                              if (date.getDay() !== 0 && date.getDay() !== 6) { // Skip weekends
+                                dates.push(date.toISOString().split('T')[0]);
+                              }
+                            }
+                            busRouteForm.setValue('availableDates', dates);
+                          }}
+                        >
+                          Weekdays Only
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => busRouteForm.setValue('availableDates', [])}
+                        >
+                          Clear All
+                        </Button>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Selected: {busRouteForm.watch('availableDates')?.length || 0} dates
+                      </div>
+                    </div>
+                    
                     <Button 
                       type="submit" 
                       disabled={createBusRouteMutation.isPending}
@@ -466,7 +530,7 @@ export default function AdminPanel() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {busRoutes?.routes?.map((route: BusRoute) => (
+                  {(busRoutes as any)?.routes?.map((route: BusRoute) => (
                     <TableRow key={route.id}>
                       <TableCell className="font-medium">{route.busNumber}</TableCell>
                       <TableCell>{route.origin} → {route.destination}</TableCell>
@@ -519,7 +583,7 @@ export default function AdminPanel() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {bookings?.bookings?.slice(0, 10).map((booking: any) => (
+                  {(bookings as any)?.bookings?.slice(0, 10).map((booking: any) => (
                     <TableRow key={booking.id}>
                       <TableCell className="font-medium">
                         {booking.student?.collegeId || booking.studentId}

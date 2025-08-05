@@ -120,8 +120,15 @@ export default function StudentPortal() {
   };
 
   const handleDateChange = (date: string) => {
-    setSelectedDate(date);
-    dateForm.setValue('travelDate', date);
+    if (selectedBus && selectedBus.availableDates?.includes(date)) {
+      setSelectedDate(date);
+      dateForm.setValue('travelDate', date);
+    }
+  };
+
+  const isDateDisabled = (date: string) => {
+    if (!selectedBus || !selectedBus.availableDates) return true;
+    return !selectedBus.availableDates.includes(date);
   };
 
   const handleBookingConfirm = () => {
@@ -151,7 +158,7 @@ export default function StudentPortal() {
   };
 
   // Check if system is offline
-  const isSystemOffline = systemStatus?.status === 'offline';
+  const isSystemOffline = (systemStatus as any)?.status === 'offline';
 
   return (
     <div className="min-h-screen">
@@ -221,9 +228,9 @@ export default function StudentPortal() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {bookingHistory?.bookings?.length > 0 ? (
+                {(bookingHistory as any)?.bookings?.length > 0 ? (
                   <div className="space-y-3">
-                    {bookingHistory.bookings.map((booking: any) => (
+                    {(bookingHistory as any).bookings.map((booking: any) => (
                       <div key={booking.id} className="border-l-4 border-success bg-green-50 dark:bg-green-950 p-4 rounded">
                         <div className="flex justify-between items-start">
                           <div>
@@ -284,9 +291,9 @@ export default function StudentPortal() {
                           <div key={i} className="animate-pulse bg-gray-200 dark:bg-gray-700 h-32 rounded-lg" />
                         ))}
                       </div>
-                    ) : busRoutes?.routes?.length > 0 ? (
+                    ) : (busRoutes as any)?.routes?.length > 0 ? (
                       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {busRoutes.routes.map((bus: BusRoute) => (
+                        {(busRoutes as any).routes.map((bus: BusRoute) => (
                           <BusCard
                             key={bus.id}
                             bus={bus}
@@ -305,13 +312,44 @@ export default function StudentPortal() {
                   {selectedBus && (
                     <div className="bg-muted rounded-lg p-6 mb-6">
                       <h4 className="text-lg font-semibold mb-4">Select Travel Date</h4>
-                      <Input
-                        type="date"
-                        value={selectedDate}
-                        onChange={(e) => handleDateChange(e.target.value)}
-                        min={new Date().toISOString().split('T')[0]}
-                        className="w-full md:w-auto"
-                      />
+                      <div className="space-y-4">
+                        <p className="text-sm text-muted-foreground">
+                          Available dates for {selectedBus.busNumber}: {selectedBus.availableDates?.length || 0} dates available
+                        </p>
+                        
+                        {selectedBus.availableDates && selectedBus.availableDates.length > 0 ? (
+                          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 max-h-48 overflow-y-auto">
+                            {selectedBus.availableDates.map((date) => {
+                              const dateObj = new Date(date);
+                              const isToday = date === new Date().toISOString().split('T')[0];
+                              const isPast = new Date(date) < new Date(new Date().setHours(0, 0, 0, 0));
+                              const isSelected = selectedDate === date;
+                              
+                              return (
+                                <Button
+                                  key={date}
+                                  variant={isSelected ? "default" : "outline"}
+                                  size="sm"
+                                  disabled={isPast}
+                                  onClick={() => handleDateChange(date)}
+                                  className={`text-xs p-2 h-auto flex flex-col ${
+                                    isPast ? 'opacity-50 cursor-not-allowed' : ''
+                                  } ${isToday ? 'ring-2 ring-primary' : ''}`}
+                                >
+                                  <span className="font-medium">
+                                    {dateObj.getDate()}
+                                  </span>
+                                  <span className="text-xs opacity-70">
+                                    {dateObj.toLocaleDateString('en-US', { month: 'short' })}
+                                  </span>
+                                </Button>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-destructive">No dates available for this bus route.</p>
+                        )}
+                      </div>
                     </div>
                   )}
 

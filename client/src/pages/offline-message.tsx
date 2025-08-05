@@ -9,7 +9,7 @@ export default function OfflineMessage() {
     refetchInterval: 30000 // Check every 30 seconds
   });
 
-  const isOffline = systemStatus?.status === 'offline';
+  const isOffline = (systemStatus as any)?.status === 'offline';
 
   if (!isOffline) return null;
 

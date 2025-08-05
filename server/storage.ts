@@ -62,7 +62,15 @@ export class MemStorage implements IStorage {
     // Set system online by default
     await this.setSystemSetting({ key: "system_status", value: "online" });
     
-    // Create some sample bus routes
+    // Create some sample bus routes with available dates
+    const today = new Date();
+    const availableDates = [];
+    for (let i = 0; i < 30; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      availableDates.push(date.toISOString().split('T')[0]);
+    }
+
     const sampleRoutes = [
       {
         busNumber: "BUS-001",
@@ -72,6 +80,7 @@ export class MemStorage implements IStorage {
         availableSeats: 23,
         departureTime: "07:30",
         returnTime: "17:00",
+        availableDates: availableDates,
         isActive: true
       },
       {
@@ -82,6 +91,7 @@ export class MemStorage implements IStorage {
         availableSeats: 8,
         departureTime: "08:00",
         returnTime: "17:30",
+        availableDates: availableDates.slice(0, 20), // Limited dates for this route
         isActive: true
       },
       {
@@ -92,6 +102,7 @@ export class MemStorage implements IStorage {
         availableSeats: 0,
         departureTime: "07:45",
         returnTime: "17:15",
+        availableDates: availableDates.slice(0, 15), // Even more limited dates
         isActive: true
       }
     ];
@@ -114,7 +125,13 @@ export class MemStorage implements IStorage {
 
   async createStudent(insertStudent: InsertStudent): Promise<Student> {
     const id = randomUUID();
-    const student: Student = { ...insertStudent, id };
+    const student: Student = { 
+      ...insertStudent, 
+      id,
+      name: insertStudent.name || null,
+      email: insertStudent.email || null,
+      phone: insertStudent.phone || null
+    };
     this.students.set(id, student);
     return student;
   }
@@ -140,7 +157,12 @@ export class MemStorage implements IStorage {
 
   async createBusRoute(insertBusRoute: InsertBusRoute): Promise<BusRoute> {
     const id = randomUUID();
-    const busRoute: BusRoute = { ...insertBusRoute, id };
+    const busRoute: BusRoute = { 
+      ...insertBusRoute, 
+      id,
+      isActive: insertBusRoute.isActive ?? true,
+      availableDates: insertBusRoute.availableDates || []
+    };
     this.busRoutes.set(id, busRoute);
     return busRoute;
   }
@@ -186,7 +208,8 @@ export class MemStorage implements IStorage {
     const booking: Booking = { 
       ...insertBooking, 
       id, 
-      bookingTime: new Date() 
+      bookingTime: new Date(),
+      status: insertBooking.status || "confirmed"
     };
     this.bookings.set(id, booking);
     
